@@ -37,7 +37,7 @@ public url:
 
 	prompt$ cd /path/to/your/parent-dir
 	prompt$ git clone git://github.com/membrain/T003_easter-egg.git
-	prompt$ cd T002_rails-overflow
+	prompt$ cd T003_easter-egg
 	prompt$ rake gems:install
 	prompt$ rake db:migrate
 
