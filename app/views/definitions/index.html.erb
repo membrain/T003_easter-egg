@@ -1,0 +1,16 @@
+<script type="text/javascript">
+	var Foo = {
+		bar: function(evt) {
+			document.body.style.backgroundColor = Foo.getColor();
+		},
+		
+		getColor: function() {
+			var color = ["#"];
+			for(var i=0; i<3; i++) {
+				color.push(Math.ceil((Math.random() * 255)).toString(16));
+			}
+			return color.join("");
+		}
+	}
+	<%= jesture %>
+</script>

@@ -5,8 +5,8 @@
 # Make sure the secret is at least 30 characters and all random, 
 # no regular words or you'll be exposed to dictionary attacks.
 ActionController::Base.session = {
-  :key         => '_T003_easter-egg_session',
-  :secret      => '61c274883fec73eff3caeb7ea1fd409196c5a3ce2be0d834dafd1ff77291105d483218c066771d4be6d327e41130a9dd3308d32b7d509b4f8165b6470078cc11'
+  :key         => '_jest_session',
+  :secret      => '3ec8ec8d80314bc52efba272caec17b11acf54ca2ef28ccdc4e8a90d58a8d8e1ab93ced9c2e1a945a371bd64ded8a76d96d8ea88a93845a0adbd960c2bb89c09'
 }
 
 # Use the database for sessions instead of the cookie-based default,
