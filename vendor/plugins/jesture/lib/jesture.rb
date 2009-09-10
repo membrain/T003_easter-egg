@@ -1,19 +1,36 @@
 module Jesture
   
   class Config
-    def initialize
-      @configs = {}
-      self.instance_eval(File.read(File.join(RAILS_ROOT, "config", "jestures.rb")))
+    attr_reader :jestures, :combos
+    
+    def initialize(file = File.join(RAILS_ROOT, "config", "jestures.rb"))
+      @jestures = {}
+      @combos = {}
+      self.instance_eval(File.read(file))
     end
     
-    def method_missing(sym, *args)
-      @configs[sym] ||= []
-      @configs[sym] << args
+    def combo(name, sequence)
+      @combos[name] = sequence
     end
     
-    def emit
-      puts "#{@configs.inspect}"
+    def jesture(name, &block)
+      raise "I need a block" if !block_given?
+      @jestures[name] = JestureDefinition.new(&block)
     end
+    
+    class JestureDefinition
+      attr_reader :triggers
+      
+      def initialize(&block)
+        @triggers = []
+        self.instance_eval(&block)
+      end
+      
+      def presses(combo_name, str = nil, &block)
+        @triggers << [ combo_name, block_given? ? block.call : "#{str}()" ]
+      end
+    end
+    
   end
   
   module ControllerMethods
@@ -21,7 +38,7 @@ module Jesture
     def self.included(base)
       base.send :alias_method,  :initialize_without_jestures, :initialize
       base.send :alias_method,  :initialize,                  :initialize_with_jestures
-      base.send :helper_method, :jestures
+      base.send :helper_method, :provide_jesture, :provide_jesture_tag
     end
   
     private
@@ -34,31 +51,29 @@ module Jesture
       @combos   = {}
       @actions  = []
     end
-  
-    def combo(name, sequence)
-      raise "Expected a name definition, but found Nil" unless name
-      raise "Expected a sequence, but found Nil" unless sequence
-      raise "The supplied sequence is empty" if sequence.empty?
     
-      @combos[name.to_sym] = sequence
-    end
-  
-    def trigger(def_name, *args, &block)
-      raise "Expected a string or a symbol for def_name, but found Nil" unless def_name
-    
-      sequence = @combos[def_name.to_sym]
-    
-      if block_given?
-        call = block.call
-      else
-        fn      = args.shift
-        js_args = args.map { |arg| ActiveSupport::JSON.encode(arg) }.join(", ")
-        call    = "#{fn}(#{js_args});"
+    def provide_jesture(name)
+      config = Jesture::Config.new
+      
+      result = []
+      jesture = config.jestures[name]
+      jesture.triggers.each do |t|
+        sequence  = config.combos[t.first]
+        js_call   = t.last
+        
+        result << generate_js(js_call, sequence)
       end
-    
-      @actions << generate_js(call, sequence)
+      result.join() 
     end
-  
+    
+    def provide_jesture_tag(*args)
+      <<-TAG
+        <script type="text/javascript">
+          #{provide_jesture(*args)}
+        </script>
+      TAG
+    end
+
     def generate_js(call, sequence)
       <<-JS
         Event.observe(document, "keydown", (function() {
@@ -84,10 +99,6 @@ module Jesture
           return l;
         })());
       JS
-    end
-  
-    def jestures
-      @actions.join
     end
   end
 end
