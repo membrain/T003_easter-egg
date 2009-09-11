@@ -1,10 +1,11 @@
 combo :foo, [:left, :right, :left, :right]
 combo :bar, [:up, :up, :up]
 combo :uppity, [38, 38, 38, 38]
+combo :konami, [ :up, :up, :down, :down, :left, :right, :left, :right, :b, :a, :enter ]
 
 jesture :fight do
   presses :foo do
-    "alert('Fight!')"
+    "document.body.innerHTML += 'Fight!'"
   end
 end
 
@@ -14,4 +15,8 @@ end
 
 jesture :complainer do
   presses :uppity, "alert('Eww! None of those here!')"
+end
+
+jesture :fantasy do
+  presses :konami, "Foo.unicorns"
 end
