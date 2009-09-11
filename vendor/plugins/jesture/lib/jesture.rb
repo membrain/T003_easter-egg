@@ -53,20 +53,22 @@ module Jesture
       @actions  = []
     end
     
-    def provide_jesture(name)
+    def provide_jesture(*args)
       config = Jesture::Config.new
       
-      raise "There is no jesture by that name! (:#{name.to_s})" if !config.jestures.has_key?(name)
+      ([ args ].flatten.map do |name|
+        raise "There is no jesture by that name! (:#{name.to_s})" if !config.jestures.has_key?(name)
       
-      result = []
-      jesture = config.jestures[name]
-      jesture.triggers.each do |t|
-        sequence  = config.combos[t.first]
-        js_call   = t.last
+        result = []
+        jesture = config.jestures[name]
+        jesture.triggers.each do |t|
+          sequence  = config.combos[t.first]
+          js_call   = t.last
         
-        result << generate_js(js_call, sequence)
-      end
-      result.join() 
+          result << generate_js(js_call, sequence)
+        end
+        result.join 
+      end).join   # parens don't have to be here, but it looks a little cleaner
     end
     
     def provide_jesture_tag(*args)
