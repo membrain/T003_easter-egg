@@ -1,5 +1,6 @@
+require "keymap"
+
 module Jesture
-  
   class Config
     attr_reader :jestures, :combos
     
@@ -55,6 +56,8 @@ module Jesture
     def provide_jesture(name)
       config = Jesture::Config.new
       
+      raise "There is no jesture by that name! (:#{name.to_s})" if !config.jestures.has_key?(name)
+      
       result = []
       jesture = config.jestures[name]
       jesture.triggers.each do |t|
@@ -75,6 +78,7 @@ module Jesture
     end
 
     def generate_js(call, sequence)
+      seq = sequence.map { |i| KEYMAP.has_key?(i) ? KEYMAP[i] : i }
       <<-JS
         Event.observe(document, "keydown", (function() {
           var l = function(evt) {
@@ -93,7 +97,7 @@ module Jesture
             }
           }
         
-          l.seq = #{ActiveSupport::JSON.encode(sequence)};
+          l.seq = #{ActiveSupport::JSON.encode(seq)};
           l.i   = 0;
         
           return l;

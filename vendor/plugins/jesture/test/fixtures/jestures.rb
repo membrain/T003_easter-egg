@@ -1,5 +1,5 @@
-combo :foo, [37, 39, 37, 39]
-combo :bar, [38, 38, 38]
+combo :foo, [:left, :right, :left, :right]
+combo :bar, [:up, :up, :up]
 
 jesture :fight do
   presses :foo do
