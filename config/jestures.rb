@@ -2,6 +2,7 @@ combo :foo, [:left, :right, :left, :right]
 combo :bar, [:up, :up, :up]
 combo :uppity, [38, 38, 38, 38]
 combo :konami, [ :up, :up, :down, :down, :left, :right, :left, :right, :b, :a, :enter ]
+combo :epileptichrome, "moodlight".split(//).map { |c| c.to_sym }
 
 jesture :fight do
   presses :foo do
@@ -19,4 +20,8 @@ end
 
 jesture :fantasy do
   presses :konami, "Foo.unicorns"
+end
+
+jesture :mood_light do
+  presses :epileptichrome, "Foo.lsd"
 end
