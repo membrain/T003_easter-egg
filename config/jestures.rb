@@ -1,8 +1,8 @@
-combo :foo, [:left, :right, :left, :right]
-combo :bar, [:up, :up, :up]
-combo :uppity, [38, 38, 38, 38]
-combo :konami, [ :up, :up, :down, :down, :left, :right, :left, :right, :b, :a, :enter ]
-combo :epileptichrome, "moodlight".split(//).map { |c| c.to_sym }
+combo :foo, :left, :right, :left, :right
+combo :bar, :up, :up, :up
+combo :uppity, 38, 38, 38, 38
+combo :konami, :up, :up, :down, :down, :left, :right, :left, :right, :b, :a, :enter
+combo :epileptichrome, :ctrl_shift_s, :shift_alt_z
 
 jesture :fight do
   presses :foo do

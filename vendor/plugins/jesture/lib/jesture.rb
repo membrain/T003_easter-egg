@@ -10,13 +10,31 @@ module Jesture
       self.instance_eval(File.read(file))
     end
     
-    def combo(name, sequence)
-      @combos[name] = sequence
+    def combo(name, *sequence)
+      @combos[name] = sequence.map { |i| Config.parse_element i }.flatten
     end
     
     def jesture(name, &block)
       raise "I need a block" if !block_given?
       @jestures[name] = JestureDefinition.new(&block)
+    end
+    
+    def self.parse_element(e)
+      if e.respond_to? :split
+        e.downcase.split(//).map { |c| { :char_key => KEYMAP[c.to_sym] } }
+      else
+        a = e.to_s.split(/_+/)
+        if a.size > 1
+          char_key = a.pop
+          mod_keys = a
+          
+          { :mod_keys => mod_keys.map { |m| MODIFIERS[m.to_sym] },
+            :char_key => KEYMAP[char_key.to_sym] }
+            
+        else
+          { :char_key => KEYMAP[e] || e.to_i }
+        end
+      end
     end
     
     class JestureDefinition
@@ -80,16 +98,26 @@ module Jesture
     end
 
     def generate_js(call, sequence)
-      seq = sequence.map { |i| KEYMAP.has_key?(i) ? KEYMAP[i] : i }
       <<-JS
         Event.observe(document, "keydown", (function() {
           var l = function(evt) {
+            var modifierKeys = [16, 17, 18, 91]; 
             var f   = arguments.callee,
                 seq = f.seq;
-              
-            if(seq[f.i] === evt.keyCode) {
-              f.i++;
-            } else {
+            
+            var charKey = seq[f.i].char_key,
+                modKeys = seq[f.i].mod_keys;
+                
+            if(charKey === evt.keyCode) {
+              if(!modKeys || modKeys.all(function(m) {return evt[m]})) {
+                f.i++;
+              } else {
+                f.i = 0;
+              }
+            } else if (modKeys && modifierKeys.indexOf(evt.keyCode) == -1) {
+              /* here we've got a case where we don't want modKeys to
+                  reset the sequence because we're detecting them above
+                  here. */
               f.i = 0;
             }
           
@@ -99,7 +127,7 @@ module Jesture
             }
           }
         
-          l.seq = #{ActiveSupport::JSON.encode(seq)};
+          l.seq = #{ActiveSupport::JSON.encode(sequence)};
           l.i   = 0;
         
           return l;

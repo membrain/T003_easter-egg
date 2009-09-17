@@ -1,6 +1,13 @@
 module Jesture
   # yeah... I typed these in. another day in the life of a badass.
-  
+
+  MODIFIERS = {
+    :ctrl => "ctrlKey",
+    :shift => "shiftKey",
+    :alt => "altKey",
+    :meta => "metaKey"
+  }
+
   KEYMAP = {
     :backspace => 8,
     :tab => 9,
